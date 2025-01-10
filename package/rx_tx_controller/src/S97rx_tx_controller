@@ -5,7 +5,6 @@ DAEMON_PATH="/usr/sbin/$DAEMON"
 PIDFILE="/var/run/$DAEMON.pid"
 DAEMON_ARGS="8888"
 
-# より確実なプロセスチェック
 is_running() {
     if [ -f "$PIDFILE" ]; then
         if kill -0 $(cat "$PIDFILE") 2>/dev/null; then
@@ -15,7 +14,6 @@ is_running() {
     return 1
 }
 
-# 完全なクリーンアップ
 cleanup() {
     if [ -f "$PIDFILE" ]; then
         pid=$(cat "$PIDFILE")
@@ -29,14 +27,12 @@ cleanup() {
 start() {
     printf 'Starting %s: ' "$DAEMON"
     
-    # 既存プロセスの確認と終了
     cleanup
     
-    cd /usr/sbin  # 作業ディレクトリを固定
+    cd /usr/sbin
     start-stop-daemon -S -q -b -m -p "$PIDFILE" \
         -x "$DAEMON_PATH" -- "$DAEMON_ARGS"
     
-    # 起動確認
     sleep 1
     if is_running; then
         echo "OK"
