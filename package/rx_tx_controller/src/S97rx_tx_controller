@@ -1,0 +1,76 @@
+#!/bin/sh
+
+DAEMON="rx_tx_controller"
+DAEMON_PATH="/usr/sbin/$DAEMON"
+PIDFILE="/var/run/$DAEMON.pid"
+DAEMON_ARGS="8888"
+
+# より確実なプロセスチェック
+is_running() {
+    if [ -f "$PIDFILE" ]; then
+        if kill -0 $(cat "$PIDFILE") 2>/dev/null; then
+            return 0
+        fi
+    fi
+    return 1
+}
+
+# 完全なクリーンアップ
+cleanup() {
+    if [ -f "$PIDFILE" ]; then
+        pid=$(cat "$PIDFILE")
+        kill "$pid" 2>/dev/null
+        rm -f "$PIDFILE"
+    fi
+    killall -q $DAEMON 2>/dev/null
+    sleep 1
+}
+
+start() {
+    printf 'Starting %s: ' "$DAEMON"
+    
+    # 既存プロセスの確認と終了
+    cleanup
+    
+    cd /usr/sbin  # 作業ディレクトリを固定
+    start-stop-daemon -S -q -b -m -p "$PIDFILE" \
+        -x "$DAEMON_PATH" -- "$DAEMON_ARGS"
+    
+    # 起動確認
+    sleep 1
+    if is_running; then
+        echo "OK"
+        return 0
+    else
+        echo "FAIL"
+        return 1
+    fi
+}
+
+stop() {
+    printf 'Stopping %s: ' "$DAEMON"
+    if is_running; then
+        cleanup
+        echo "OK"
+        return 0
+    else
+        echo "not running"
+        return 0
+    fi
+}
+
+restart() {
+    stop
+    sleep 2
+    start
+}
+
+case "$1" in
+    start|stop|restart)
+        "$1"
+        ;;
+    *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+        ;;
+esac

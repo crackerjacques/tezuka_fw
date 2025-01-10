@@ -1,0 +1,5 @@
+config BR2_PACKAGE_RX_TX_CONTROLLER
+    bool "rx_tx_controller"
+    help
+      OSC server for controlling RF input/output switching
+      using AD9361/AD9364 chips.
