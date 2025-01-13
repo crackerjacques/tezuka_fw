@@ -6,9 +6,9 @@ set -e
 BOARD_DIR=$(dirname ${0})
 
 # Add a console on tty1
-#grep -qE '^ttyGS0::' ${TARGET_DIR}/etc/inittab || \
-#sed -i '/GENERIC_SERIAL/a\
-#ttyGS0::respawn:/sbin/getty -L ttyGS0 0 vt100 # USB console' ${TARGET_DIR}/etc/inittab
+grep -qE '^ttyGS0::' ${TARGET_DIR}/etc/inittab || \
+sed -i '/GENERIC_SERIAL/a\
+ttyGS0::respawn:/sbin/getty -L ttyGS0 0 vt100 # USB console' ${TARGET_DIR}/etc/inittab
 
 #ttyGS0 is not relevant and persistant on u-boot. As ACM seems to allows ONLY one serial, let use it as a general Serial link
 #Rev C has a 2nd tty port plugged on usb power to have a full control
@@ -83,6 +83,7 @@ ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S23udc ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S40network ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S41network ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S45msd ${TARGET_DIR}/etc/init.d/
+${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S50avahi-daemon ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S55hostkeys ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0755 ${BOARD_ROOTFS}/S98autostart ${TARGET_DIR}/etc/init.d/
 ${INSTALL} -D -m 0644 ${BOARD_ROOTFS}/fw_env.config ${TARGET_DIR}/etc/
